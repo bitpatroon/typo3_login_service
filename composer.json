@@ -23,14 +23,9 @@
   "config": {
     "optimize-autoloader": true
   },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "0.0.x-dev"
-    }
-  },
   "autoload": {
     "psr-4": {
-      "BPN\\TYpo3LoginService\\": "Classes"
+      "BPN\\Typo3LoginService\\": "Classes"
     }
   }
 }
