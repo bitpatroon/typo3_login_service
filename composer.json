@@ -1,0 +1,34 @@
+{
+  "name": "bitpatroon/typo3_login_service",
+  "type": "typo3-cms-extension",
+  "description": "Service is used to technical setup a FE user in an eID or login a user using the users uid or username.",
+  "keywords": [
+    "typo3",
+    "login",
+    "service"
+  ],
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "Sjoerd Zonneveld",
+      "homepage": "https://www.bitpatroon.nl",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "typo3/cms-core": ">=7.6.0 < 7.6.99"
+  },
+  "config": {
+    "optimize-autoloader": true
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.0.x-dev"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "BPN\\TYpo3LoginService\\": "Classes"
+    }
+  }
+}
