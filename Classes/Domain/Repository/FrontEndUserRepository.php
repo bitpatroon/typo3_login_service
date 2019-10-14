@@ -26,8 +26,6 @@
 
 namespace BPN\Typo3LoginService\Domain\Repository;
 
-use SPL\SplLibrary\Utility\QueryHelper;
-
 class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
 {
 
@@ -47,7 +45,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
             'fe_users',
             implode(' AND ', [
                 sprintf('%s=%s', 'username', $dbHandle->fullQuoteStr($username ?: '', 'fe_users')),
-                QueryHelper::enableFields('fe_users', false)
+                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->enableFields('fe_users', false)
             ])
         );
 
@@ -74,7 +72,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
             'fe_users',
             implode(' AND ', [
                 sprintf('%s=%s', 'uid', (int)$uid),
-                QueryHelper::enableFields('fe_users', false)
+                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->enableFields('fe_users', false)
             ])
         );
     }

@@ -6,9 +6,7 @@ namespace BPN\Typo3LoginService\Controller;
 
 use BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
-use SPL\SplLibrary\AccessControl\AuthorizationService;
 use BPN\Typo3LoginService\RequestHandler\CodeLoginRequestHandler;
-use SPL\SplLibrary\Utility\ObjectManagerHelper;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -48,9 +46,7 @@ class CodeLoginController extends AbstractLoginController
 
         $requestHandler->handleRequest($globalRequest);
 
-        /** @var AuthorizationService $authorizationService */
-        $authorizationService = ObjectManagerHelper::get(AuthorizationService::class);
-        return $authorizationService->isCurrentFrontendUserLoggedIn();
+        return $this->isCurrentFrontendUserLoggedIn();
     }
 
     /**
@@ -71,4 +67,6 @@ class CodeLoginController extends AbstractLoginController
 
         return $uid;
     }
+
+
 }

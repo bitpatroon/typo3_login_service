@@ -29,6 +29,7 @@ use PHPUnit\Framework\Assert;
 use TYPO3\CMS\Core\Tests\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+
 class CodeLoginControllerTest extends FunctionalTestCase
 {
     protected function setUp()

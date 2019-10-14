@@ -2,9 +2,7 @@
 
 namespace BPN\Typo3LoginService\Controller;
 
-use SPL\SplLibrary\AccessControl\AuthorizationService;
 use BPN\Typo3LoginService\RequestHandler\EidLoginRequestHandler;
-use SPL\SplLibrary\Utility\ObjectManagerHelper;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -30,9 +28,6 @@ class EidLoginController extends AbstractLoginController
         }
 
         $eidLoginRequestHandler->handleRequest($globalRequest);
-
-        /** @var AuthorizationService $authorizationService */
-        $authorizationService = ObjectManagerHelper::get(AuthorizationService::class);
-        return $authorizationService->isCurrentFrontendUserLoggedIn();
+        return $this->isCurrentFrontendUserLoggedIn();
     }
 }
