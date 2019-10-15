@@ -40,7 +40,7 @@ class QueryHelper implements SingletonInterface
      * @param bool   $ignoreGroupChecks
      * @return string
      */
-    public function getEnableFields($table, $allowHidden, $allowExpired, $ignoreGroupChecks)
+    public function getEnableFields($table, $allowHidden = false, $allowExpired = false, $ignoreGroupChecks = false)
     {
         if (TYPO3_MODE === 'BE') {
             $enableFields = BackendUtility::BEEnableFields($table, 0);

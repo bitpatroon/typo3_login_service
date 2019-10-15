@@ -45,7 +45,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
             'fe_users',
             implode(' AND ', [
                 sprintf('%s=%s', 'username', $dbHandle->fullQuoteStr($username ?: '', 'fe_users')),
-                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->enableFields('fe_users', false)
+                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->getEnableFields('fe_users')
             ])
         );
 
@@ -72,7 +72,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
             'fe_users',
             implode(' AND ', [
                 sprintf('%s=%s', 'uid', (int)$uid),
-                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->enableFields('fe_users', false)
+                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->getEnableFields('fe_users')
             ])
         );
     }
