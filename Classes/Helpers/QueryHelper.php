@@ -40,6 +40,23 @@ class QueryHelper implements SingletonInterface
      * @param bool   $ignoreGroupChecks
      * @return string
      */
+    public function getEnableFieldsNoAnd($table, $allowHidden = false, $allowExpired = false, $ignoreGroupChecks = false)
+    {
+        $condition = $this->getEnableFields($table, $allowHidden, $allowExpired, $ignoreGroupChecks);
+        if (empty($condition)){
+            return $condition;
+        }
+
+        return substr($condition, 5);
+    }
+
+    /**
+     * @param string $table
+     * @param bool   $allowHidden
+     * @param bool   $allowExpired
+     * @param bool   $ignoreGroupChecks
+     * @return string
+     */
     public function getEnableFields($table, $allowHidden = false, $allowExpired = false, $ignoreGroupChecks = false)
     {
         if (TYPO3_MODE === 'BE') {
@@ -48,8 +65,6 @@ class QueryHelper implements SingletonInterface
         }
 
         if (TYPO3_MODE === 'FE') {
-
-
             $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
             return $cObj->enableFields($table, $allowHidden, self::getIgnoreArray($allowExpired, $ignoreGroupChecks, $allowHidden));
         }
