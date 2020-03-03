@@ -30,6 +30,8 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Page\PageRepository;
 
 class QueryHelper implements SingletonInterface
 {
@@ -65,6 +67,16 @@ class QueryHelper implements SingletonInterface
         }
 
         if (TYPO3_MODE === 'FE') {
+            /** @var TypoScriptFrontendController $tsfe */
+            $tsfe = $GLOBALS['TSFE'];
+            if (empty($tsfe)) {
+                return '';
+            }
+            if (empty($tsfe->sys_page)) {
+                /** @var PageRepository $pageRepository */
+                $tsfe->sys_page = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(PageRepository::class);
+            }
+            /** @var ContentObjectRenderer $cObj */
             $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
             return $cObj->enableFields($table, $allowHidden, self::getIgnoreArray($allowExpired, $ignoreGroupChecks, $allowHidden));
         }
