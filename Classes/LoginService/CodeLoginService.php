@@ -61,6 +61,7 @@ class CodeLoginService extends AbstractService implements SingletonInterface
      * @param array  $loginData Submitted login form data.
      * @param array  $authInfo  Information array. Holds submitted form data etc.
      * @param object $pObj      Parent object.
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
     public function initAuth(
         /** @noinspection PhpUnusedParameterInspection */

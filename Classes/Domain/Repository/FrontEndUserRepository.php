@@ -26,6 +26,9 @@
 
 namespace BPN\Typo3LoginService\Domain\Repository;
 
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
 {
 
@@ -33,23 +36,27 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
      * @param string $username
      * @return bool|int false if not found. The uid otherwise
      */
-    public function getByUserName($username){
-        if(empty($username)){
+    public function getByUserName($username)
+    {
+        if (empty($username)) {
             return false;
         }
 
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $dbHandle */
-        $dbHandle = $GLOBALS['TYPO3_DB'];
-        $row = $dbHandle->exec_SELECTgetSingleRow(
-            'uid',
-            'fe_users',
-            implode(' AND ', [
-                sprintf('%s=%s', 'username', $dbHandle->fullQuoteStr($username ?: '', 'fe_users')),
-                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->getEnableFieldsNoAnd('fe_users')
-            ])
-        );
+        //$table = self::TABLE;
+        $table = 'fe_users';
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
 
-        if(empty($row)){
+        $queryBuilder
+            ->select('*')
+            ->from($table)
+            ->where(
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username)),
+            );
+
+        // retrieve single record
+        $row = $queryBuilder->execute()->fetch();
+        if (empty($row)) {
             return 0;
         }
 
@@ -58,23 +65,11 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
 
     /**
      * @param int $uid
-     * @return bool|array the user record or false if not found
+     * @return object
      */
-    public function getByUid($uid){
-        if(empty($uid)){
-            return false;
-        }
-
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $dbHandle */
-        $dbHandle = $GLOBALS['TYPO3_DB'];
-        return $dbHandle->exec_SELECTgetSingleRow(
-            '*',
-            'fe_users',
-            implode(' AND ', [
-                sprintf('%s=%s', 'uid', (int)$uid),
-                \BPN\Typo3LoginService\Helpers\QueryHelper::getInstance()->getEnableFieldsNoAnd('fe_users')
-            ])
-        );
+    public function getByUid($uid)
+    {
+        return parent::findByUid($uid);
     }
 
 }

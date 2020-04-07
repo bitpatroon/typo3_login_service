@@ -34,17 +34,11 @@ class CodeLoginController extends AbstractLoginController
         $codeLoginService = $objectManager->get(CodeLoginService::class);
         $codeLoginService->setTargetUserId($uid);
 
-        $globalRequest = ServerRequestFactory::fromGlobals();
-        $bootstrap = Bootstrap::getInstance();
 
         /** @var CodeLoginRequestHandler $requestHandler */
-        $requestHandler = GeneralUtility::makeInstance(CodeLoginRequestHandler::class, $bootstrap);
+        $requestHandler = GeneralUtility::makeInstance(CodeLoginRequestHandler::class);
 
-        if (!$requestHandler->canHandleRequest($globalRequest)) {
-            return null;
-        }
-
-        $requestHandler->handleRequest($globalRequest);
+        $requestHandler->handleRequest();
 
         return $this->isCurrentFrontendUserLoggedIn();
     }

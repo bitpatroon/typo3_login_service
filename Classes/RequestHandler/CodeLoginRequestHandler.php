@@ -28,48 +28,45 @@ namespace BPN\Typo3LoginService\RequestHandler;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Core\Routing\PageArguments;
+use TYPO3\CMS\Core\Site\Entity\NullSite;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Http\RequestHandler;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
 
-class CodeLoginRequestHandler extends RequestHandler
+class CodeLoginRequestHandler // extends RequestHandler
 {
     /**
      * Handles a frontend request
      *
-     * @param ServerRequestInterface $request
      * @return NULL|ResponseInterface
      */
-    public function handleRequest(ServerRequestInterface $request)
+    public function handleRequest()
     {
-        if (empty($request)) {
-            return null;
-        }
-
-        $controller = $this->getController();
+        $controller = $this->getTypoScriptFrontendController();
 
         // temporarily add the (new) login service!
         $this->registerService();
 
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'])){
+        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'])) {
             // enable auto-login
             $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = 1;
         }
 
-//        if(empty($controller->fe_user->svConfig)){
-//            $controller->fe_user->svConfig[] = [
-//                'setup' => [
-//                    'FE_fetchUserIfNoSession' => 1
-//                ]
-//            ];
-//        }
-
-        if (!empty($controller->fe_user)){
+        if (!empty($controller->fe_user)) {
             // disable hook(s)
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing'] = null;
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing'] = null;
-
 
             \Bitpatroon\Typo3Hooks\Helpers\HooksHelper::processHook($this, 'on_before_logging_off');
 
@@ -77,41 +74,43 @@ class CodeLoginRequestHandler extends RequestHandler
 //            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\SPL\SplExtUpdates\T3Hooks\FrontendUserAuthentication::class]['on_after_logoff'] = null;
             $controller->fe_user->logoff();
         }
-        $controller->initFEuser();
+
+        /** @var FrontendUserAuthentication $frontendUserAuthentication */
+        $frontendUserAuthentication = GeneralUtility::makeInstance(FrontendUserAuthentication::class);
+        $controller->fe_user = $frontendUserAuthentication;
+
+        // initiate the login
+        $controller->fe_user->start();
+
         $controller->initUserGroups();
 
         return null;
     }
 
-    /**
-     * This request handler can handle any frontend request.
-     *
-     * @param ServerRequestInterface $request
-     * @return bool If the request is not an eID request, TRUE otherwise FALSE
-     */
-    public function canHandleRequest(ServerRequestInterface $request)
-    {
-        return true;
-    }
-
-    /**
-     * @return TypoScriptFrontendController
-     */
-    protected function getController()
-    {
-        if (empty($GLOBALS['TSFE'])) {
-            parent::initializeController();
-        } elseif(empty($this->controller)){
-            $this->controller = $GLOBALS['TSFE'];
-        }
-
-        return $this->controller;
-    }
+//    /**
+//     * This request handler can handle any frontend request.
+//     *
+//     * @param ServerRequestInterface $request
+//     * @return bool If the request is not an eID request, TRUE otherwise FALSE
+//     */
+//    public function canHandleRequest(ServerRequestInterface $request)
+//    {
+//        return true;
+//    }
+//
+//    /**
+//     * @return TypoScriptFrontendController
+//     */
+//    protected function getController()
+//    {
+//        return $this->getTypoScriptFrontendController();
+//    }
 
     /**
      * registers the service for logging in by code
      */
-    protected function registerService(){
+    protected function registerService()
+    {
         // register the service
         ExtensionManagementUtility::addService(
             'typo3_login_service',
@@ -129,6 +128,52 @@ class CodeLoginRequestHandler extends RequestHandler
                 'className'   => CodeLoginService::class,
             ]
         );
+    }
+
+    /**
+     * @return TypoScriptFrontendController
+     */
+    public function getTypoScriptFrontendController(): TypoScriptFrontendController
+    {
+        if (!empty($GLOBALS['TSFE']) && $GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+            return $GLOBALS['TSFE'];
+        }
+
+        // This usually happens when typolink is created by the TYPO3 Backend, where no TSFE object
+        // is there. This functionality is currently completely internal, as these links cannot be
+        // created properly from the Backend.
+        // However, this is added to avoid any exceptions when trying to create a link.
+        // Detecting the "first" site usually comes from the fact that TSFE needs to be instantiated
+        // during tests
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+        $site = $request->getAttribute('site');
+        if (!$site instanceof Site) {
+            $sites = GeneralUtility::makeInstance(SiteFinder::class)->getAllSites();
+            $site = reset($sites);
+            if (!$site instanceof Site) {
+                $site = new NullSite();
+            }
+        }
+        $language = $request->getAttribute('language');
+        if (!$language instanceof SiteLanguage) {
+            $language = $site->getDefaultLanguage();
+        }
+
+        $id = $request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? $site->getRootPageId();
+        $type = $request->getQueryParams()['type'] ?? $request->getParsedBody()['type'] ?? '0';
+
+        $typoScriptFrontendController = GeneralUtility::makeInstance(
+            TypoScriptFrontendController::class,
+            GeneralUtility::makeInstance(Context::class),
+            $site,
+            $language,
+            $request->getAttribute('routing', new PageArguments((int)$id, (string)$type, []))
+        );
+        $typoScriptFrontendController->sys_page = GeneralUtility::makeInstance(PageRepository::class);
+        $typoScriptFrontendController->tmpl = GeneralUtility::makeInstance(TemplateService::class);
+
+        $GLOBALS['TSFE'] = $typoScriptFrontendController;
+        return $typoScriptFrontendController;
     }
 
 }
