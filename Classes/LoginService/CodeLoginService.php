@@ -62,14 +62,11 @@ class CodeLoginService extends AbstractService implements SingletonInterface
      * @param array  $authInfo  Information array. Holds submitted form data etc.
      * @param object $pObj      Parent object.
      * @throws \TYPO3\CMS\Extbase\Object\Exception
+     * @noinspection PhpUnused
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function initAuth(
-        /** @noinspection PhpUnusedParameterInspection */
-        $mode,
-        $loginData,
-        $authInfo,
-        $pObj
-    ) {
+    public function initAuth($mode, $loginData, $authInfo, $pObj)
+    {
         if (empty($this->targetUserId)) {
             return;
         }
@@ -87,6 +84,7 @@ class CodeLoginService extends AbstractService implements SingletonInterface
      * Find a user. (eg. look up the user record in database when a login is sent)
      * @return    mixed User array or FALSE.
      * @throws \Exception
+     * @noinspection PhpUnused
      */
     public function getUser()
     {
@@ -108,10 +106,11 @@ class CodeLoginService extends AbstractService implements SingletonInterface
      * 100 - Just go on. User is not authenticated but there's still no reason to stop.
      * false - this service was the right one to authenticate the user but it failed.
      * true - this service was able to authenticate the user.
+     * @noinspection PhpUnused
      */
     public function authUser($user)
     {
-        if (!empty($user)){
+        if (!empty($user)) {
             return 200;
         }
         return 0;

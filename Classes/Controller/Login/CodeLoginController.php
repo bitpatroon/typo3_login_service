@@ -1,14 +1,12 @@
 <?php
 
 
-namespace BPN\Typo3LoginService\Controller;
+namespace BPN\Typo3LoginService\Controller\Login;
 
 
 use BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
 use BPN\Typo3LoginService\RequestHandler\CodeLoginRequestHandler;
-use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
@@ -16,12 +14,14 @@ class CodeLoginController extends AbstractLoginController
 {
     /**
      * Method logs a user in
-     * @param int|string  $uidOrUsername
+     * @param int|string $uidOrUsername
      * @return array|bool|null
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
     public function loginUser($uidOrUsername)
     {
-        if(empty($uidOrUsername)){
+        if (empty($uidOrUsername)) {
             return ['error' => 'Missing value for userid', 'ts' => '1567503579121'];
         }
 
@@ -34,10 +34,8 @@ class CodeLoginController extends AbstractLoginController
         $codeLoginService = $objectManager->get(CodeLoginService::class);
         $codeLoginService->setTargetUserId($uid);
 
-
         /** @var CodeLoginRequestHandler $requestHandler */
         $requestHandler = GeneralUtility::makeInstance(CodeLoginRequestHandler::class);
-
         $requestHandler->handleRequest();
 
         return $this->isCurrentFrontendUserLoggedIn();
@@ -47,8 +45,10 @@ class CodeLoginController extends AbstractLoginController
      * Gets the uid
      * @param string|int $uidOrUsername
      * @return bool|int
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
-    private function getUid($uidOrUsername){
+    private function getUid($uidOrUsername)
+    {
         $uid = $uidOrUsername;
         if (!is_numeric($uidOrUsername)) {
             /** @var ObjectManager $objectManager */

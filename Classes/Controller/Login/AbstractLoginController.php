@@ -1,7 +1,7 @@
 <?php
 
 
-namespace BPN\Typo3LoginService\Controller;
+namespace BPN\Typo3LoginService\Controller\Login;
 
 
 class AbstractLoginController
@@ -25,17 +25,14 @@ class AbstractLoginController
      */
     public function isCurrentFrontendUserLoggedIn($checkStrict = false)
     {
-        /** @noinspection PhpInternalEntityUsedInspection */
         if (empty($GLOBALS['TSFE']) || empty($GLOBALS['TSFE']->fe_user) || empty($GLOBALS['TSFE']->fe_user->user)) {
             return false;
         }
 
-        /** @noinspection PhpInternalEntityUsedInspection */
         if (!isset($GLOBALS['TSFE']->fe_user->user['uid']) || empty($GLOBALS['TSFE']->fe_user->user['uid'])) {
             return false;
         }
 
-        /** @noinspection PhpInternalEntityUsedInspection */
         if (!isset($GLOBALS['TSFE']->fe_user->user['username']) || empty($GLOBALS['TSFE']->fe_user->user['username'])) {
             return false;
         }

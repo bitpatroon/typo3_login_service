@@ -51,7 +51,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
             ->select('*')
             ->from($table)
             ->where(
-                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username)),
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
             );
 
         // retrieve single record
@@ -69,7 +69,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
      */
     public function getByUid($uid)
     {
-        return parent::findByUid($uid);
+        return $this->findByUid($uid);
     }
 
 }

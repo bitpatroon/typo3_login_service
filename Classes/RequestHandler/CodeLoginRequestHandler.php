@@ -26,10 +26,8 @@
 
 namespace BPN\Typo3LoginService\RequestHandler;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Bitpatroon\Typo3Hooks\Helpers\HooksHelper;
 use TYPO3\CMS\Core\Context\Context;
-use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
@@ -40,16 +38,13 @@ use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
-use TYPO3\CMS\Frontend\Http\RequestHandler;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class CodeLoginRequestHandler // extends RequestHandler
+class CodeLoginRequestHandler
 {
     /**
      * Handles a frontend request
-     *
-     * @return NULL|ResponseInterface
      */
     public function handleRequest()
     {
@@ -67,11 +62,7 @@ class CodeLoginRequestHandler // extends RequestHandler
             // disable hook(s)
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing'] = null;
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing'] = null;
-
-            \Bitpatroon\Typo3Hooks\Helpers\HooksHelper::processHook($this, 'on_before_logging_off');
-
-//            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\SPL\SplExtUpdates\T3Hooks\FrontendUserAuthentication::class]['on_before_logoff'] = null;
-//            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\SPL\SplExtUpdates\T3Hooks\FrontendUserAuthentication::class]['on_after_logoff'] = null;
+            HooksHelper::processHook($this, 'on_before_logging_off');
             $controller->fe_user->logoff();
         }
 
@@ -81,30 +72,8 @@ class CodeLoginRequestHandler // extends RequestHandler
 
         // initiate the login
         $controller->fe_user->start();
-
         $controller->initUserGroups();
-
-        return null;
     }
-
-//    /**
-//     * This request handler can handle any frontend request.
-//     *
-//     * @param ServerRequestInterface $request
-//     * @return bool If the request is not an eID request, TRUE otherwise FALSE
-//     */
-//    public function canHandleRequest(ServerRequestInterface $request)
-//    {
-//        return true;
-//    }
-//
-//    /**
-//     * @return TypoScriptFrontendController
-//     */
-//    protected function getController()
-//    {
-//        return $this->getTypoScriptFrontendController();
-//    }
 
     /**
      * registers the service for logging in by code
@@ -169,7 +138,7 @@ class CodeLoginRequestHandler // extends RequestHandler
             $language,
             $request->getAttribute('routing', new PageArguments((int)$id, (string)$type, []))
         );
-        $typoScriptFrontendController->sys_page = GeneralUtility::makeInstance(PageRepository::class);
+        $typoScriptFrontendController->sys_page = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Domain\Repository\PageRepository::class);
         $typoScriptFrontendController->tmpl = GeneralUtility::makeInstance(TemplateService::class);
 
         $GLOBALS['TSFE'] = $typoScriptFrontendController;

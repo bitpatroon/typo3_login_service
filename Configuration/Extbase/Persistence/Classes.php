@@ -1,9 +1,10 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2019 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
- *  Date: 14-10-2019 21:00
+ *  (c) 2020 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
+ *  Date: 7-4-2020 12:42
  *
  *  All rights reserved
  *
@@ -24,9 +25,11 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-namespace BPN\Typo3LoginService\Domain\Repository\V87;
 
-class FrontEndUserRepository extends \BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository
-{
+declare(strict_types=1);
 
-}
+return [
+    \BPN\Typo3LoginService\Domain\Model\FrontEndUser::class => [
+        'tableName'  => 'fe_users',
+    ]
+];

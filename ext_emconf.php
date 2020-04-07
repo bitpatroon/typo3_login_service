@@ -11,7 +11,7 @@ $EM_CONF[$_EXTKEY] = [
     'conflicts'                     => '',
     'priority'                      => '',
     'module'                        => '',
-    'state'                         => 'stable',
+    'state'                         => 'beta',
     'internal'                      => '',
     'uploadfolder'                  => 0,
     'createDirs'                    => '',
@@ -19,10 +19,9 @@ $EM_CONF[$_EXTKEY] = [
     'clearCacheOnLoad'              => 0,
     'lockType'                      => '',
     'author_company'                => 'Bitpatroon',
-    'version'                       => '0.0.1',
+    'version'                       => '10.3',
     'constraints'                   => [
         'depends'   => [
-            'typo3' => '7.6.0-8.7.99'
         ],
         'conflicts' => [
         ],

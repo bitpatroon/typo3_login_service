@@ -26,33 +26,14 @@
 
 namespace BPN\Typo3LoginService\RequestHandler;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Frontend\Http\RequestHandler;
 
 /**
  * Class LoginRequestHandler
  * @package SPL\SplLibrary\RequestHandler
  */
-class EidLoginRequestHandler extends RequestHandler
+class EidLoginRequestHandler  extends CodeLoginRequestHandler
 {
-    /**
-     * Handles a frontend request
-     *
-     * @param ServerRequestInterface $request
-     * @return NULL|ResponseInterface
-     */
-    public function handleRequest(ServerRequestInterface $request)
-    {
-        if (empty($request)){
-            return null;
-        }
-
-        $controller = $this->getController();
-        $controller->initFEuser();
-
-        return null;
-    }
 
     /**
      * This request handler can handle any frontend request.
@@ -73,17 +54,6 @@ class EidLoginRequestHandler extends RequestHandler
         }
 
         return true;
-    }
-
-    /**
-     * @return \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController
-     */
-    protected function getController()
-    {
-        if(empty($GLOBALS['TSFE'])) {
-            parent::initializeController();
-        }
-        return $this->controller;
     }
 
 }

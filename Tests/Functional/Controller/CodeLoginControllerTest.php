@@ -24,19 +24,24 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use BPN\Typo3LoginService\Controller\CodeLoginController;
+namespace BPN\Typo3LoginService\Tests\Functional\Controller\CodeLoginController;
+
+use BPN\Typo3LoginService\Controller\Login\CodeLoginController;
 use PHPUnit\Framework\Assert;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
-
 class CodeLoginControllerTest extends FunctionalTestCase
 {
+
+    /** @noinspection PhpUnused */
     protected function setUp(): void
     {
         define('TYPO3_ERROR_DLOG', 0);
 
         parent::setUp();
+
+        $this->testExtensionsToLoad[] = 'web/typo3conf/ext/typo3_login_service';
 
         $this->importDataSet(dirname(__DIR__) . '/Fixtures/LoginControllerTestFixture.xml');
     }
