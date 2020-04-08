@@ -2,8 +2,8 @@
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2019 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
- *  Date: 3-9-2019 17:42
+ *  (c) 2020 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
+ *  Date: 8-4-2020 21:39
  *
  *  All rights reserved
  *
