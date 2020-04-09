@@ -31,6 +31,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
 {
+    const TABLE = 'fe_users';
 
     /**
      * @param string $username
@@ -42,8 +43,7 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
             return false;
         }
 
-        //$table = self::TABLE;
-        $table = 'fe_users';
+        $table = self::TABLE;
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable($table);
 
@@ -65,11 +65,28 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
 
     /**
      * @param int $uid
-     * @return object
+     * @return bool|array
      */
     public function getByUid($uid)
     {
-        return $this->findByUid($uid);
+        if (empty($uid)) {
+            return false;
+        }
+
+        $table = self::TABLE;
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
+
+        $queryBuilder
+            ->select('*')
+            ->from($table)
+            ->where(
+                $queryBuilder->expr()->eq('uid', $uid)
+            );
+
+        // retrieve single record
+        $row = $queryBuilder->execute()->fetch();
+        return empty($row) ? 0 : $row;
     }
 
 }
