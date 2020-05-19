@@ -95,7 +95,7 @@ class EidRequestController
             return $this->JsonEncode($result);
         }
 
-        return null;
+        return $this->JsonEncode(['error' => 'no result']);
     }
 
     /**
