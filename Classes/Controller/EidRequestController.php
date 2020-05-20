@@ -40,7 +40,7 @@ class EidRequestController
     /**
      * Handles the request
      * use by calling
-     * - index.php?eID=tx_typo3loginservice&request=test_eidinit
+     * - index.php?eID=tx_typo3loginservice&action=test_eidinit
      *
      * @return mixed
      * @noinspection PhpUnused
@@ -56,16 +56,16 @@ class EidRequestController
             ]);
         }
 
-        $method = $request->getQueryParams()['request'] ?? '';
+        $method = $request->getQueryParams()['action'] ?? '';
         switch ($method) {
             case 'test_eidinit':
                 /** @var EidLoginController $loginController */
                 $eidLoginController = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(EidLoginController::class);
-                $authenticaticated = $eidLoginController->initFeUser();
+                $authenticated = $eidLoginController->initFeUser();
                 $result = [
-                    'request'       => $request,
+                    'request'       => $request->getQueryParams(),
                     'authenticated' => [
-                        'status' => $authenticaticated,
+                        'status' => $authenticated,
                         'userid' => $eidLoginController->getAuthenticatedUserId()
                     ]
                 ];
@@ -75,11 +75,11 @@ class EidRequestController
                 $userid = GeneralUtility::_GP('userid');
                 /** @var CodeLoginController $eidLoginController */
                 $loginController = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(CodeLoginController::class);
-                $authenticaticated = $loginController->loginUser($userid);
+                $authenticated = $loginController->loginUser($userid);
                 $result = [
                     'user'          => $userid,
                     'authenticated' => [
-                        'status' => $authenticaticated,
+                        'status' => $authenticated,
                         'userid' => $loginController->getAuthenticatedUserId()
                     ]
                 ];
