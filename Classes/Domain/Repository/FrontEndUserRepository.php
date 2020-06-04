@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -28,8 +29,9 @@ namespace BPN\Typo3LoginService\Domain\Repository;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository as FrontendUserRepositoryAlias;
 
-class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
+class FrontEndUserRepository extends FrontendUserRepositoryAlias
 {
     const TABLE = 'fe_users';
 
@@ -88,5 +90,4 @@ class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\Fronte
         $row = $queryBuilder->execute()->fetch();
         return empty($row) ? 0 : $row;
     }
-
 }

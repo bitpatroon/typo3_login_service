@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -71,10 +72,9 @@ class CodeLoginService extends AbstractService implements SingletonInterface
             return;
         }
 
-        /** @var ObjectManager $objectManager */
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         /** @var FrontEndUserRepository $frontEndUserRepository */
-        $frontEndUserRepository = $objectManager->get(FrontEndUserRepository::class);
+        $frontEndUserRepository = GeneralUtility::makeInstance(ObjectManager::class)
+            ->get(FrontEndUserRepository::class);
         /** @var QueryResultInterface|array $user */
         $this->userRecord = $frontEndUserRepository->getByUid($this->targetUserId);
         $this->targetUserId = 0;
@@ -97,7 +97,8 @@ class CodeLoginService extends AbstractService implements SingletonInterface
     }
 
     /**
-     * Authenticate a user. (Check various conditions for the user that might invalidate its authentication, eg. password match, domain, IP, etc.)
+     * Authenticate a user. (Check various conditions for the user that might invalidate its authentication,
+     * eg. password match, domain, IP, etc.)
      *
      * @param array $user Data of user.
      * @return    bool    Possible return values:
@@ -115,5 +116,4 @@ class CodeLoginService extends AbstractService implements SingletonInterface
         }
         return 0;
     }
-
 }

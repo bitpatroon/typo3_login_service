@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -26,15 +27,15 @@
 
 namespace BPN\Typo3LoginService\Controller\Login;
 
-
 class AbstractLoginController
 {
     /**
      * Gets the authenticated userid
      * @return bool|int
      */
-    public function getAuthenticatedUserId(){
-        if (empty($GLOBALS['TSFE'] || empty($GLOBALS['TSFE']->fe_user) || empty($GLOBALS['TSFE']->fe_user->user))){
+    public function getAuthenticatedUserId()
+    {
+        if (empty($GLOBALS['TSFE'] || empty($GLOBALS['TSFE']->fe_user) || empty($GLOBALS['TSFE']->fe_user->user))) {
             return false;
         }
 
@@ -66,5 +67,4 @@ class AbstractLoginController
 
         return true;
     }
-
 }

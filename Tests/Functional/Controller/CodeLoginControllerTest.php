@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -50,7 +51,7 @@ class CodeLoginControllerTest extends FunctionalTestCase
      * @test
      * @param int  $userId
      * @param bool $expectedResult
-     * @dataProvider dataProvider_eIDInitWorksAsExpected
+     * @dataProvider dataProviderEIDInitWorksAsExpected
      */
     public function loginUserWorksAsExpected($userId, $expectedResult)
     {
@@ -59,21 +60,23 @@ class CodeLoginControllerTest extends FunctionalTestCase
 
         /** @var CodeLoginController $loginController */
         $loginController = GeneralUtility::makeInstance(CodeLoginController::class);
-        Assert::assertEquals($expectedResult, $loginController->loginUser($userId), sprintf("User with id %d is not with success logged in", $userId));
+        Assert::assertEquals(
+            $expectedResult,
+            $loginController->loginUser($userId),
+            sprintf('User with id %d is not with success logged in', $userId)
+        );
     }
 
     /**
      * @return array
      */
-    public function dataProvider_eIDInitWorksAsExpected()
+    public function dataProviderEIDInitWorksAsExpected()
     {
         return [
             [1, true],
-//            ['authenticated_user', true],
-//            [2, false],
-//            ['unknown_user', false]
+            ['authenticated_user', true],
+            [2, false],
+            ['unknown_user', false]
         ];
     }
-
-
 }

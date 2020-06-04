@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -28,6 +29,7 @@ namespace BPN\Typo3LoginService\RequestHandler;
 
 use Bitpatroon\Typo3Hooks\Helpers\HooksHelper;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
@@ -60,8 +62,10 @@ class CodeLoginRequestHandler
 
         if (!empty($controller->fe_user)) {
             // disable hook(s)
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing'] = null;
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing'] = null;
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing']
+                = null;
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing']
+                = null;
             HooksHelper::processHook($this, 'on_before_logging_off');
             $controller->fe_user->logoff();
         }
@@ -138,11 +142,10 @@ class CodeLoginRequestHandler
             $language,
             $request->getAttribute('routing', new PageArguments((int)$id, (string)$type, []))
         );
-        $typoScriptFrontendController->sys_page = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Domain\Repository\PageRepository::class);
+        $typoScriptFrontendController->sys_page = GeneralUtility::makeInstance(PageRepository::class);
         $typoScriptFrontendController->tmpl = GeneralUtility::makeInstance(TemplateService::class);
 
         $GLOBALS['TSFE'] = $typoScriptFrontendController;
         return $typoScriptFrontendController;
     }
-
 }

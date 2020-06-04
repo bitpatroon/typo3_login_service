@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -32,7 +33,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Class LoginRequestHandler
  * @package SPL\SplLibrary\RequestHandler
  */
-class EidLoginRequestHandler  extends CodeLoginRequestHandler
+class EidLoginRequestHandler extends CodeLoginRequestHandler
 {
 
     /**
@@ -44,7 +45,7 @@ class EidLoginRequestHandler  extends CodeLoginRequestHandler
     public function canHandleRequest(ServerRequestInterface $request)
     {
         $isEid = !empty($request->getQueryParams()['eID']) || !empty($request->getParsedBody()['eID']);
-        if(!$isEid){
+        if (!$isEid) {
             return false;
         }
 
@@ -55,5 +56,4 @@ class EidLoginRequestHandler  extends CodeLoginRequestHandler
 
         return true;
     }
-
 }

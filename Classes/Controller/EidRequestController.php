@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -36,7 +37,6 @@ use TYPO3\CMS\Core\Utility\HttpUtility;
 
 class EidRequestController
 {
-
     /**
      * Handles the request
      * use by calling
@@ -49,7 +49,7 @@ class EidRequestController
     {
         if (!RemoteWhitelistController::isHostAllowed('typo3_login_service')) {
             header(HttpUtility::HTTP_STATUS_403);
-            return $this->JsonEncode([
+            return $this->json([
                 'error' => 'access denied',
                 'code'  => 403,
                 'icode' => 1586274077
@@ -92,17 +92,17 @@ class EidRequestController
         }
 
         if (!empty($result)) {
-            return $this->JsonEncode($result);
+            return $this->json($result);
         }
 
-        return $this->JsonEncode(['error' => 'no result']);
+        return $this->json(['error' => 'no result']);
     }
 
     /**
      * @param array $result
      * @return JsonResponse
      */
-    private function JsonEncode(array $result): JsonResponse
+    private function json(array $result): JsonResponse
     {
         /** @var JsonResponse $jsonResponse */
         return GeneralUtility::makeInstance(JsonResponse::class, $result);

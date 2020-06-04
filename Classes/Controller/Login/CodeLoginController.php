@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -26,7 +27,6 @@
 
 namespace BPN\Typo3LoginService\Controller\Login;
 
-
 use BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
 use BPN\Typo3LoginService\RequestHandler\CodeLoginRequestHandler;
@@ -50,11 +50,9 @@ class CodeLoginController extends AbstractLoginController
 
         $uid = $this->getUid($uidOrUsername);
 
-        /** @var ObjectManager $objectManager */
-        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(ObjectManager::class);
-
         /** @var CodeLoginService $codeLoginService */
-        $codeLoginService = $objectManager->get(CodeLoginService::class);
+        $codeLoginService = GeneralUtility::makeInstance(ObjectManager::class)
+            ->get(CodeLoginService::class);
         $codeLoginService->setTargetUserId($uid);
 
         /** @var CodeLoginRequestHandler $requestHandler */
@@ -74,16 +72,13 @@ class CodeLoginController extends AbstractLoginController
     {
         $uid = $uidOrUsername;
         if (!is_numeric($uidOrUsername)) {
-            /** @var ObjectManager $objectManager */
-            $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(ObjectManager::class);
 
             /** @var FrontEndUserRepository $frontEndUserRepository */
-            $frontEndUserRepository = $objectManager->get(FrontEndUserRepository::class);
+            $frontEndUserRepository = GeneralUtility::makeInstance(ObjectManager::class)
+                ->get(FrontEndUserRepository::class);
             $uid = $frontEndUserRepository->getByUserName($uidOrUsername);
         }
 
         return $uid;
     }
-
-
 }

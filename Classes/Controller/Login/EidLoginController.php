@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,6 +24,7 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
 namespace BPN\Typo3LoginService\Controller\Login;
 
 use BPN\Typo3LoginService\RequestHandler\EidLoginRequestHandler;
