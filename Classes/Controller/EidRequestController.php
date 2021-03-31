@@ -47,13 +47,15 @@ class EidRequestController
      */
     public function handleRequest(ServerRequestInterface $request): JsonResponse
     {
-        if (!RemoteWhitelistController::isHostAllowed('typo3_login_service')) {
-            header(HttpUtility::HTTP_STATUS_403);
-            return $this->json([
-                'error' => 'access denied',
-                'code'  => 403,
-                'icode' => 1586274077
-            ]);
+        if (class_exists('BPN\BpnWhitelist\Controller\RemoteWhitelistController')){
+            if (!RemoteWhitelistController::isHostAllowed('typo3_login_service')) {
+                header(HttpUtility::HTTP_STATUS_403);
+                return $this->json([
+                    'error' => 'access denied',
+                    'code'  => 403,
+                    'icode' => 1586274077
+                ]);
+            }
         }
 
         $method = $request->getQueryParams()['action'] ?? '';
