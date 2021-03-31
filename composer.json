@@ -19,7 +19,7 @@
   "require": {
     "php": "^7.2",
     "typo3/cms-core": "^10.4",
-    "bitpatroon/typo3_hooks": "^1.0"
+    "bitpatroon/typo3_hooks": "^1.1"
   },
   "config": {
     "optimize-autoloader": true
