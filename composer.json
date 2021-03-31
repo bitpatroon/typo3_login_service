@@ -15,11 +15,11 @@
       "role": "Developer"
     }
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
-    "php": "^7.2",
+    "php": "^7.3",
     "typo3/cms-core": "^10.4",
-    "bitpatroon/typo3_hooks": "^1.1"
+    "bitpatroon/typo3_hooks": "^1.2:q"
   },
   "config": {
     "optimize-autoloader": true
