@@ -28,6 +28,7 @@
 namespace BPN\Typo3LoginService\RequestHandler;
 
 use Bitpatroon\Typo3Hooks\Helpers\HooksHelper;
+use BPN\Typo3LoginService\LoginService\CodeUserAuthenticationAuthentication;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
@@ -39,6 +40,7 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
@@ -55,28 +57,24 @@ class CodeLoginRequestHandler
         // temporarily add the (new) login service!
         $this->registerService();
 
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'])) {
-            // enable auto-login
-            $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = 1;
-        }
+//        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'])) {
+//            // enable auto-login
+//            $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = 1;
+//        }
+//
+//        if (!empty($controller->fe_user)) {
+//            // disable hook(s)
+//            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing']
+//                = null;
+//            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing']
+//                = null;
+//            HooksHelper::processHook($this, 'on_before_logging_off');
+//            $controller->fe_user->logoff();
+//        }
 
-        if (!empty($controller->fe_user)) {
-            // disable hook(s)
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing']
-                = null;
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing']
-                = null;
-            HooksHelper::processHook($this, 'on_before_logging_off');
-            $controller->fe_user->logoff();
-        }
-
-        /** @var FrontendUserAuthentication $frontendUserAuthentication */
-        $frontendUserAuthentication = GeneralUtility::makeInstance(FrontendUserAuthentication::class);
-        $controller->fe_user = $frontendUserAuthentication;
-
-        // initiate the login
-        $controller->fe_user->start();
-        $controller->initUserGroups();
+        /** @var CodeUserAuthenticationAuthentication $frontendUserAuthentication */
+        $frontendUserAuthentication = GeneralUtility::makeInstance(CodeUserAuthenticationAuthentication::class);
+        $frontendUserAuthentication->start();
     }
 
     /**
@@ -106,7 +104,7 @@ class CodeLoginRequestHandler
     /**
      * @return TypoScriptFrontendController
      */
-    public function getTypoScriptFrontendController(): TypoScriptFrontendController
+    public function getTypoScriptFrontendController() : TypoScriptFrontendController
     {
         if (!empty($GLOBALS['TSFE']) && $GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
             return $GLOBALS['TSFE'];
@@ -146,6 +144,26 @@ class CodeLoginRequestHandler
         $typoScriptFrontendController->tmpl = GeneralUtility::makeInstance(TemplateService::class);
 
         $GLOBALS['TSFE'] = $typoScriptFrontendController;
+
         return $typoScriptFrontendController;
     }
+
+    /**
+     * Invokes protected / private method
+     *
+     * @param object $instance   reference to object
+     * @param string $methodName method name
+     * @param array  $arguments  arguments
+     *
+     * @return mixed result of the original call
+     */
+    public function invokeProtected(&$instance, $methodName, $arguments = [])
+    {
+        /** @var \ReflectionMethod $methodReflection */
+        $methodReflection = new \ReflectionMethod($instance, $methodName);
+        $methodReflection->setAccessible(true);
+
+        return $methodReflection->invokeArgs($instance, $arguments);
+    }
+
 }

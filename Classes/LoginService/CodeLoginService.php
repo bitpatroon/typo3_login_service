@@ -28,13 +28,14 @@
 namespace BPN\Typo3LoginService\LoginService;
 
 use BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository;
+use TYPO3\CMS\Core\Authentication\AuthenticationService;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 
-class CodeLoginService extends AbstractService implements SingletonInterface
+class CodeLoginService extends AuthenticationService implements SingletonInterface
 {
     /**
      * @var int
@@ -64,7 +65,6 @@ class CodeLoginService extends AbstractService implements SingletonInterface
      * @param object $pObj      Parent object.
      * @throws \TYPO3\CMS\Extbase\Object\Exception
      * @noinspection PhpUnused
-     * @noinspection PhpUnusedParameterInspection
      */
     public function initAuth($mode, $loginData, $authInfo, $pObj)
     {
@@ -109,7 +109,7 @@ class CodeLoginService extends AbstractService implements SingletonInterface
      * true - this service was able to authenticate the user.
      * @noinspection PhpUnused
      */
-    public function authUser($user)
+    public function authUser(array $user): int
     {
         if (!empty($user)) {
             return 200;

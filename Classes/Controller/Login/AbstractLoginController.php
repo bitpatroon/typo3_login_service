@@ -61,6 +61,10 @@ class AbstractLoginController
             return false;
         }
 
+        if (isset($GLOBALS['TSFE']->fe_user->user['ses_anonymous']) && $GLOBALS['TSFE']->fe_user->user['ses_anonymous']) {
+            return false;
+        }
+
         if ($checkStrict) {
             return !empty($_COOKIE['fe_typo_user']);
         }
