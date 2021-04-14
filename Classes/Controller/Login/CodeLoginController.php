@@ -37,7 +37,9 @@ class CodeLoginController extends AbstractLoginController
 {
     /**
      * Method logs a user in
+     *
      * @param int|string $uidOrUsername
+     *
      * @return array|bool|null
      * @throws \TYPO3\CMS\Extbase\Object\Exception
      * @throws \TYPO3\CMS\Extbase\Object\Exception
@@ -45,7 +47,10 @@ class CodeLoginController extends AbstractLoginController
     public function loginUser($uidOrUsername)
     {
         if (empty($uidOrUsername)) {
-            return ['error' => 'Missing value for userid', 'ts' => '1567503579121'];
+            throw new \RuntimeException(
+                'Cannot login. No user id or username',
+                1567503579121
+            );
         }
 
         $uid = $this->getUid($uidOrUsername);
@@ -57,14 +62,15 @@ class CodeLoginController extends AbstractLoginController
 
         /** @var CodeLoginRequestHandler $requestHandler */
         $requestHandler = GeneralUtility::makeInstance(CodeLoginRequestHandler::class);
-        $requestHandler->handleRequest();
 
-        return $this->isCurrentFrontendUserLoggedIn();
+        return $requestHandler->handleRequest();
     }
 
     /**
      * Gets the uid
+     *
      * @param string|int $uidOrUsername
+     *
      * @return bool|int
      * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
@@ -72,7 +78,6 @@ class CodeLoginController extends AbstractLoginController
     {
         $uid = $uidOrUsername;
         if (!is_numeric($uidOrUsername)) {
-
             /** @var FrontEndUserRepository $frontEndUserRepository */
             $frontEndUserRepository = GeneralUtility::makeInstance(ObjectManager::class)
                 ->get(FrontEndUserRepository::class);

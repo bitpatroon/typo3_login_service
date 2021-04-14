@@ -44,15 +44,16 @@ class CodeUserAuthenticationAuthentication extends FrontendUserAuthentication
 
         $userId = $this->getUserId();
 
-        $tempuser = [$this->userid_column => $userId];
-        $sessionData = $this->createUserSession($tempuser);
+        $tempUser = [$this->userid_column => $userId];
+        $sessionData = $this->createUserSession($tempUser);
         $this->user = array_merge(
-            $tempuser,
+            $tempUser,
             $sessionData
         );
 
         $this->setSessionCookie();
-        $authenticated = true;
+
+        $this->authenticated = true;
     }
 
     private function getUserId() : int
@@ -84,6 +85,7 @@ class CodeUserAuthenticationAuthentication extends FrontendUserAuthentication
         if ($feUser) {
             return $feUser->getUid();
         }
+
         return 0;
     }
 

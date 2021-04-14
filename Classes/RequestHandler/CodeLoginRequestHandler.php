@@ -28,7 +28,9 @@
 namespace BPN\Typo3LoginService\RequestHandler;
 
 use Bitpatroon\Typo3Hooks\Helpers\HooksHelper;
+use BPN\Typo3LoginService\LoginService\CodeLoginService;
 use BPN\Typo3LoginService\LoginService\CodeUserAuthenticationAuthentication;
+use Cem\Sitepackage\Services\UsersServices;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
@@ -40,15 +42,13 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
-use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
-use BPN\Typo3LoginService\LoginService\CodeLoginService;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class CodeLoginRequestHandler
 {
     /**
-     * Handles a frontend request
+     * Handles a frontend request.
      */
     public function handleRequest()
     {
@@ -57,28 +57,34 @@ class CodeLoginRequestHandler
         // temporarily add the (new) login service!
         $this->registerService();
 
-//        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'])) {
-//            // enable auto-login
-//            $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = 1;
-//        }
-//
-//        if (!empty($controller->fe_user)) {
-//            // disable hook(s)
-//            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing']
-//                = null;
-//            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing']
-//                = null;
-//            HooksHelper::processHook($this, 'on_before_logging_off');
-//            $controller->fe_user->logoff();
-//        }
+        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'])) {
+            // enable auto-login
+            $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = 1;
+        }
+
+        /** @var UsersServices $usersServices */
+        $usersServices = GeneralUtility::makeInstance(ObjectManager::class)
+            ->get(UsersServices::class);
+
+        if ($usersServices->isLoggedIn()) {
+            // disable hook(s)
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing']
+                = null;
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing']
+                = null;
+            HooksHelper::processHook($this, 'on_before_logging_off');
+            $controller->fe_user->logoff();
+        }
 
         /** @var CodeUserAuthenticationAuthentication $frontendUserAuthentication */
         $frontendUserAuthentication = GeneralUtility::makeInstance(CodeUserAuthenticationAuthentication::class);
         $frontendUserAuthentication->start();
+
+        return $frontendUserAuthentication->authenticated;
     }
 
     /**
-     * registers the service for logging in by code
+     * registers the service for logging in by code.
      */
     protected function registerService()
     {
@@ -101,9 +107,6 @@ class CodeLoginRequestHandler
         );
     }
 
-    /**
-     * @return TypoScriptFrontendController
-     */
     public function getTypoScriptFrontendController() : TypoScriptFrontendController
     {
         if (!empty($GLOBALS['TSFE']) && $GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
@@ -149,7 +152,7 @@ class CodeLoginRequestHandler
     }
 
     /**
-     * Invokes protected / private method
+     * Invokes protected / private method.
      *
      * @param object $instance   reference to object
      * @param string $methodName method name
@@ -165,5 +168,4 @@ class CodeLoginRequestHandler
 
         return $methodReflection->invokeArgs($instance, $arguments);
     }
-
 }

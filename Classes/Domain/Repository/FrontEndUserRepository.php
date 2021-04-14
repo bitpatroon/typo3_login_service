@@ -37,6 +37,7 @@ class FrontEndUserRepository extends FrontendUserRepositoryAlias
 
     /**
      * @param string $username
+     *
      * @return bool|int false if not found. The uid otherwise
      */
     public function getByUserName($username)
@@ -57,7 +58,7 @@ class FrontEndUserRepository extends FrontendUserRepositoryAlias
             );
 
         // retrieve single record
-        $row = $queryBuilder->execute()->fetch();
+        $row = $queryBuilder->execute()->fetchOne();
         if (empty($row)) {
             return 0;
         }
@@ -67,6 +68,7 @@ class FrontEndUserRepository extends FrontendUserRepositoryAlias
 
     /**
      * @param int $uid
+     *
      * @return bool|array
      */
     public function getByUid($uid)
@@ -88,6 +90,7 @@ class FrontEndUserRepository extends FrontendUserRepositoryAlias
 
         // retrieve single record
         $row = $queryBuilder->execute()->fetch();
+
         return empty($row) ? 0 : $row;
     }
 }
