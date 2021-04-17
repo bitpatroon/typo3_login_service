@@ -27,6 +27,7 @@
 
 namespace BPN\Typo3LoginService\LoginService;
 
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
@@ -39,16 +40,19 @@ class CodeUserAuthenticationAuthentication extends FrontendUserAuthentication
 
     public function start()
     {
+        $this->authenticated = false;
         $this->id = $this->createSessionId();
         $this->newSessionID = true;
 
-        $userId = $this->getUserId();
+        $tempUser = $this->getAndValidateUser();
+        if (!$tempUser) {
+            return;
+        }
 
-        $tempUser = [$this->userid_column => $userId];
         $sessionData = $this->createUserSession($tempUser);
         $this->user = array_merge(
-            $tempUser,
-            $sessionData
+            $sessionData,
+            $tempUser
         );
 
         $this->setSessionCookie();
@@ -56,37 +60,32 @@ class CodeUserAuthenticationAuthentication extends FrontendUserAuthentication
         $this->authenticated = true;
     }
 
-    private function getUserId() : int
+    private function getAndValidateUser()
     {
         /** @var CodeLoginService $codeLoginService */
         $codeLoginService = GeneralUtility::makeInstance(CodeLoginService::class);
         $codeLoginService->initAuth('FE', [], [], $this);
-        $user = $codeLoginService->getUser();
-
-        // check if is a (valid) user
-        $userUid = $this->getUser($user['uid']);
-        if (!$userUid) {
-            throw new \RuntimeException(
-                'Cannot login an invalid user',
-                1617902339
-            );
+        $userRecord = $codeLoginService->getUser();
+        if (!$userRecord || !isset($userRecord['uid']) || !(int)$userRecord['uid']) {
+            return false;
         }
 
-        return $userUid;
-    }
+        // check if is a (valid) user (existing and not hidden and not deleted)
+        $uid = (int)$userRecord['uid'];
 
-    private function getUser(int $uid) : int
-    {
         /** @var FrontendUserRepository $feUserRepo */
         $feUserRepo = GeneralUtility::makeInstance(ObjectManager::class)
             ->get(FrontendUserRepository::class);
         /** @var FrontendUser $feUser */
         $feUser = $feUserRepo->findByUid($uid);
-        if ($feUser) {
-            return $feUser->getUid();
+        if ($feUser && $feUser->getUid()) {
+            return $userRecord;
         }
 
-        return 0;
+        throw new \RuntimeException(
+            'User not found. Cannot continue',
+            1617902339
+        );
     }
 
 }
