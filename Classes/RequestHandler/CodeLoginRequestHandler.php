@@ -30,7 +30,7 @@ namespace BPN\Typo3LoginService\RequestHandler;
 use Bitpatroon\Typo3Hooks\Helpers\HooksHelper;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
 use BPN\Typo3LoginService\LoginService\CodeUserAuthenticationAuthentication;
-use Cem\Sitepackage\Services\UsersServices;
+use BPN\Typo3LoginService\Services\UserService;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
@@ -62,16 +62,14 @@ class CodeLoginRequestHandler
             $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = 1;
         }
 
-        /** @var UsersServices $usersServices */
+        /** @var UserService $usersService */
         $usersServices = GeneralUtility::makeInstance(ObjectManager::class)
-            ->get(UsersServices::class);
+            ->get(UserService::class);
 
         if ($usersServices->isLoggedIn()) {
             // disable hook(s)
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing']
-                = null;
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing']
-                = null;
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_pre_processing'] = null;
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['logoff_post_processing'] = null;
             HooksHelper::processHook($this, 'on_before_logging_off');
             $controller->fe_user->logoff();
         }
@@ -107,7 +105,7 @@ class CodeLoginRequestHandler
         );
     }
 
-    public function getTypoScriptFrontendController() : TypoScriptFrontendController
+    public function getTypoScriptFrontendController(): TypoScriptFrontendController
     {
         if (!empty($GLOBALS['TSFE']) && $GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
             return $GLOBALS['TSFE'];
@@ -141,7 +139,7 @@ class CodeLoginRequestHandler
             GeneralUtility::makeInstance(Context::class),
             $site,
             $language,
-            $request->getAttribute('routing', new PageArguments((int)$id, (string)$type, []))
+            $request->getAttribute('routing', new PageArguments((int) $id, (string) $type, []))
         );
         $typoScriptFrontendController->sys_page = GeneralUtility::makeInstance(PageRepository::class);
         $typoScriptFrontendController->tmpl = GeneralUtility::makeInstance(TemplateService::class);
