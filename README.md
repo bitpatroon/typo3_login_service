@@ -26,3 +26,6 @@ When you need to login a user from code, and you know the users uid, call the fo
 
 2020-04-08
 * This version is updated to work with TYPO3 v10.3.
+
+2023-09-11
+* This version is potentially unssafe in relation to other services. Use at own risk
