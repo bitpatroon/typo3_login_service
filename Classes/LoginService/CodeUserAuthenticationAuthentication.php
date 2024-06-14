@@ -34,6 +34,9 @@ use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
+/**
+ * @deprecated No longer used
+ */
 class CodeUserAuthenticationAuthentication extends FrontendUserAuthentication
 {
     public $authenticated = false;

@@ -27,7 +27,7 @@
 
 namespace BPN\Typo3LoginService\Controller\Login;
 
-use BPN\Typo3LoginService\RequestHandler\EidLoginRequestHandler;
+use BPN\Typo3LoginService\RequestHandler\v8\EidLoginRequestHandler;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

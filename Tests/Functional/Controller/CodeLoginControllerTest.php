@@ -1,10 +1,9 @@
 <?php
-
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2020 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
- *  Date: 8-4-2020 21:39
+ *  (c) 2019 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
+ *  Date: 3-9-2019 17:42
  *
  *  All rights reserved
  *
@@ -24,25 +23,19 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
-namespace BPN\Typo3LoginService\Tests\Functional\Controller\CodeLoginController;
-
-use BPN\Typo3LoginService\Controller\Login\CodeLoginController;
+use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
+use BPN\Typo3LoginService\Controller\CodeLoginController;
 use PHPUnit\Framework\Assert;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
+
 
 class CodeLoginControllerTest extends FunctionalTestCase
 {
-
-    /** @noinspection PhpUnused */
-    protected function setUp(): void
+    protected function setUp()
     {
         define('TYPO3_ERROR_DLOG', 0);
 
         parent::setUp();
-
-        $this->testExtensionsToLoad[] = 'web/typo3conf/ext/typo3_login_service';
 
         $this->importDataSet(dirname(__DIR__) . '/Fixtures/LoginControllerTestFixture.xml');
     }
@@ -51,7 +44,7 @@ class CodeLoginControllerTest extends FunctionalTestCase
      * @test
      * @param int  $userId
      * @param bool $expectedResult
-     * @dataProvider dataProviderEIDInitWorksAsExpected
+     * @dataProvider dataProvider_eIDInitWorksAsExpected
      */
     public function loginUserWorksAsExpected($userId, $expectedResult)
     {
@@ -60,17 +53,13 @@ class CodeLoginControllerTest extends FunctionalTestCase
 
         /** @var CodeLoginController $loginController */
         $loginController = GeneralUtility::makeInstance(CodeLoginController::class);
-        Assert::assertEquals(
-            $expectedResult,
-            $loginController->loginUser($userId),
-            sprintf('User with id %d is not with success logged in', $userId)
-        );
+        Assert::assertEquals($expectedResult, $loginController->loginUser($userId), sprintf("User with id %d is not with success logged in", $userId));
     }
 
     /**
      * @return array
      */
-    public function dataProviderEIDInitWorksAsExpected()
+    public function dataProvider_eIDInitWorksAsExpected()
     {
         return [
             [1, true],
@@ -79,4 +68,6 @@ class CodeLoginControllerTest extends FunctionalTestCase
             ['unknown_user', false]
         ];
     }
+
+
 }

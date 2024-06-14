@@ -1,10 +1,9 @@
 <?php
-
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2020 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
- *  Date: 8-4-2020 21:38
+ *  (c) 2019 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
+ *  Date: 2-9-2019 16:39
  *
  *  All rights reserved
  *
@@ -28,15 +27,17 @@
 namespace BPN\Typo3LoginService\LoginService;
 
 use BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository;
-use TYPO3\CMS\Core\Authentication\AuthenticationService;
+use BPN\Typo3LoginService\Traits\InitiatedBy;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 
-class CodeLoginService extends AuthenticationService implements SingletonInterface
+class CodeLoginService extends AbstractService implements SingletonInterface
 {
+    use InitiatedBy;
+
     /**
      * @var int
      */
@@ -63,18 +64,17 @@ class CodeLoginService extends AuthenticationService implements SingletonInterfa
      * @param array  $loginData Submitted login form data.
      * @param array  $authInfo  Information array. Holds submitted form data etc.
      * @param object $pObj      Parent object.
-     * @throws \TYPO3\CMS\Extbase\Object\Exception
-     * @noinspection PhpUnused
      */
-    public function initAuth($mode, $loginData, $authInfo, $pObj)
+    public function initAuth(string $mode, array $loginData = [], array $authInfo = [], object $pObj = null)
     {
-        if (empty($this->targetUserId)) {
+        if (!$this->targetUserId) {
             return;
         }
 
+        /** @var ObjectManager $objectManager */
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         /** @var FrontEndUserRepository $frontEndUserRepository */
-        $frontEndUserRepository = GeneralUtility::makeInstance(ObjectManager::class)
-            ->get(FrontEndUserRepository::class);
+        $frontEndUserRepository = $objectManager->get(FrontEndUserRepository::class);
         /** @var QueryResultInterface|array $user */
         $this->userRecord = $frontEndUserRepository->getByUid($this->targetUserId);
         $this->targetUserId = 0;
@@ -82,38 +82,44 @@ class CodeLoginService extends AuthenticationService implements SingletonInterfa
 
     /**
      * Find a user. (eg. look up the user record in database when a login is sent)
+     *
      * @return    mixed User array or FALSE.
      * @throws \Exception
-     * @noinspection PhpUnused
      */
     public function getUser()
     {
-        if (!empty($this->userRecord)) {
-            return $this->userRecord;
+        if ($this->userRecord) {
+            self::$initiatedByMe = true;
+            $result = $this->userRecord;
+            unset($this->userRecord);
+        } else {
+            $result = [];
         }
 
-        unset($this->userRecord);
-        return [];
+        return $result;
     }
 
     /**
-     * Authenticate a user. (Check various conditions for the user that might invalidate its authentication,
-     * eg. password match, domain, IP, etc.)
+     * Authenticate a user. (Check various conditions for the user that might invalidate its authentication, eg.
+     * password match, domain, IP, etc.)
      *
      * @param array $user Data of user.
+     *
      * @return    bool    Possible return values:
      *
      * 200 - authenticated and no more checking needed - useful for IP checking without password.
      * 100 - Just go on. User is not authenticated but there's still no reason to stop.
      * false - this service was the right one to authenticate the user but it failed.
      * true - this service was able to authenticate the user.
-     * @noinspection PhpUnused
      */
-    public function authUser(array $user): int
+    public function authUser($user)
     {
-        if (!empty($user)) {
+        if ($user && self::isInitiatedByMe()) {
+            self::$initiatedByMe = false;
             return 200;
         }
+
         return 0;
     }
+
 }

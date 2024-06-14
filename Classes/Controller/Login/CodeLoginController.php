@@ -29,10 +29,13 @@ namespace BPN\Typo3LoginService\Controller\Login;
 
 use BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository;
 use BPN\Typo3LoginService\LoginService\CodeLoginService;
-use BPN\Typo3LoginService\RequestHandler\CodeLoginRequestHandler;
+use BPN\Typo3LoginService\RequestHandler\v8\CodeLoginRequestHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
+/**
+ * @deprecated. Use \BPN\Typo3LoginService\Controller\CodeLoginController
+ */
 class CodeLoginController extends AbstractLoginController
 {
     /**

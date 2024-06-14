@@ -1,10 +1,9 @@
 <?php
-
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2020 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
- *  Date: 8-4-2020 21:39
+ *  (c) 2019 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
+ *  Date: 2-9-2019 12:05
  *
  *  All rights reserved
  *
@@ -25,13 +24,17 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-namespace BPN\Typo3LoginService\RequestHandler;
+namespace BPN\Typo3LoginService\RequestHandler\v8;
 
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Class LoginRequestHandler
- * @package SPL\SplLibrary\RequestHandler
+ *
+ * @deprecated Depends on v8 of Typo3
  */
 class EidLoginRequestHandler extends CodeLoginRequestHandler
 {
@@ -40,6 +43,7 @@ class EidLoginRequestHandler extends CodeLoginRequestHandler
      * This request handler can handle any frontend request.
      *
      * @param ServerRequestInterface $request
+     *
      * @return bool If the request is not an eID request, TRUE otherwise FALSE
      */
     public function canHandleRequest(ServerRequestInterface $request)
@@ -51,9 +55,27 @@ class EidLoginRequestHandler extends CodeLoginRequestHandler
 
         // Ensure the user is logged in. If so no further action
         if (!empty($GLOBALS['TSFE'])) {
-            return empty($GLOBALS['TSFE']->loginUser);
+            return empty(
+            GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect(
+                'frontend.user',
+                'isLoggedIn'
+            )
+            );
         }
 
         return true;
     }
+
+    /**
+     * @return TypoScriptFrontendController
+     */
+    protected function getController()
+    {
+        if (empty($GLOBALS['TSFE'])) {
+            parent::initializeController();
+        }
+
+        return $this->controller;
+    }
+
 }

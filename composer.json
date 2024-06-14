@@ -1,35 +1,37 @@
 {
-  "name": "bitpatroon/typo3_login_service",
-  "type": "typo3-cms-extension",
-  "description": "Service is used to technical setup a FE user in an eID or login a user using the users uid or username.",
-  "keywords": [
-    "typo3",
-    "login",
-    "service"
-  ],
-  "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "Sjoerd Zonneveld",
-      "homepage": "https://www.bitpatroon.nl",
-      "role": "Developer"
+    "name": "bitpatroon/typo3_login_service",
+    "type": "typo3-cms-extension",
+    "description": "Service is used to technical setup a FE user in an eID or login a user using the users uid or username.",
+    "version": "v9.5.99",
+    "keywords": [
+        "typo3",
+        "login",
+        "service",
+        "authentication",
+        "Service Provider"
+    ],
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Sjoerd Zonneveld",
+            "homepage": "https://www.bitpatroon.nl",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "autoload": {
+        "psr-4": {
+            "BPN\\Typo3LoginService\\": "Classes"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "typo3_login_service"
+        }
     }
-  ],
-  "minimum-stability": "stable",
-  "require": {
-    "bitpatroon/typo3_hooks": "^1.3"
-  },
-  "config": {
-    "optimize-autoloader": true
-  },
-  "autoload": {
-    "psr-4": {
-      "BPN\\Typo3LoginService\\": "Classes"
-    }
-  },
-  "extra": {
-    "typo3/cms": {
-      "extension-key": "typo3_login_service"
-    }
-  }
 }

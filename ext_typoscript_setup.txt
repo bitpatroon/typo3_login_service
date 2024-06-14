@@ -1,0 +1,9 @@
+config.tx_extbase.persistence {
+    classes {
+        BPN\Typo3LoginService\Domain\Model\FrontEndUser {
+            mapping {
+                tableName = fe_users
+            }
+        }
+    }
+}

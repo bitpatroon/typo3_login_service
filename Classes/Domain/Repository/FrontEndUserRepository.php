@@ -1,10 +1,9 @@
 <?php
-
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2020 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
- *  Date: 8-4-2020 21:38
+ *  (c) 2019 Sjoerd Zonneveld  <typo3@bitpatroon.nl>
+ *  Date: 2-9-2019 16:21
  *
  *  All rights reserved
  *
@@ -27,70 +26,98 @@
 
 namespace BPN\Typo3LoginService\Domain\Repository;
 
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository as FrontendUserRepositoryAlias;
 
-class FrontEndUserRepository extends FrontendUserRepositoryAlias
+class FrontEndUserRepository extends \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
 {
-    const TABLE = 'fe_users';
+    /**
+     * Gets the userId
+     *
+     * @param string $userId the usernaem or uid
+     *
+     * @return int
+     */
+    public function getUserId(string $userId)
+    {
+        $user = $this->findUser($userId);
+        if ($user) {
+            return (int)$user['uid'];
+        }
+
+        return 0;
+    }
 
     /**
      * @param string $username
      *
      * @return bool|int false if not found. The uid otherwise
+     * @deprecated \BPN\Typo3LoginService\Domain\Repository\FrontEndUserRepository::getUserId
      */
-    public function getByUserName($username)
+    public function getByUserName(string $username)
     {
-        if (empty($username)) {
-            return false;
-        }
-
-        $table = self::TABLE;
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable($table);
-
-        $queryBuilder
-            ->select('*')
-            ->from($table)
-            ->where(
-                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
-            );
-
-        // retrieve single record
-        $row = $queryBuilder->execute()->fetchOne();
-        if (empty($row)) {
-            return 0;
-        }
-
-        return (int)$row['uid'];
+        return $this->getUserId($username);
     }
 
     /**
      * @param int $uid
      *
-     * @return bool|array
+     * @return bool|array the user record or false if not found
      */
-    public function getByUid($uid)
+    public function getByUid(int $uid = 0)
     {
-        if (empty($uid)) {
-            return false;
+        return $this->findUser((string)$uid);
+    }
+
+    /**
+     *  Gets the record by uid or name
+     *
+     * @param string $userId       A user id or a username
+     * @param bool   $allowExpired true to allow expired to be added to the collection of users
+     *
+     * @return array|null
+     */
+    public function findUser(string $userId, bool $allowExpired = false)
+    {
+        if (!$userId) {
+            return null;
         }
 
-        $table = self::TABLE;
+        $table = 'fe_users';
+
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable($table);
+                                      ->getQueryBuilderForTable($table);
+
+        if ($allowExpired) {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        }
+
+        $where = [];
+        if (is_numeric($userId)) {
+            $where[] = $queryBuilder->expr()->eq('uid', (int)$userId);
+        } else {
+            $where[] = $queryBuilder->expr()->orx(
+                $queryBuilder->expr()->eq(
+                    'username',
+                    $queryBuilder->createNamedParameter($userId, Connection::PARAM_STR)
+                ),
+            );
+        }
 
         $queryBuilder
             ->select('*')
             ->from($table)
-            ->where(
-                $queryBuilder->expr()->eq('uid', $uid)
-            );
+            ->where(...$where);
 
-        // retrieve single record
-        $row = $queryBuilder->execute()->fetch();
-
-        return empty($row) ? 0 : $row;
+        return $queryBuilder->execute()->fetch() ?? null;
     }
+
+
 }
